@@ -52,14 +52,26 @@ class SearchRepository @Inject constructor(private val movieService: MovieServic
             try {
                 val response = request.execute()
                 if (response.isSuccessful) {
-                    liveDataSearchResult.postValue(response.body())
+                    // If there is no result, it shows response as false. We will wrap the object
+                    // in a "true" result and 0 elements
+                    if (response.body()!!.response == false) {
+                        var searchResult = SearchResult(emptyList(), 0, true)
+                        liveDataSearchResult.postValue(searchResult)
+                    } else {
+                        liveDataSearchResult.postValue(response.body())
+                    }
                 } else {
                     Log.d(TAG, "NOT SUCCESFUL")
+                    // If something happens, just return an empty list
+                    var searchResult = SearchResult(emptyList(), 0, false)
+                    liveDataSearchResult.postValue(searchResult)
                 }
 
                 Log.d(TAG, "FINISHED")
             } catch (e: Exception) {
                 Log.d(TAG, "FAILURE: " + e.localizedMessage + " ||| " + e.message)
+                var searchResult = SearchResult(emptyList(), 0, false)
+                liveDataSearchResult.postValue(searchResult)
             }
         }
 

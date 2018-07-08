@@ -85,7 +85,11 @@ class SearchFragment : Fragment() {
                                 yearSearchEt.text.toString())?.observe(this,
                 Observer {
                     showLoading(false)
-                    listener?.onMoviesListResult()
+                    if (it?.response == false) {
+                        showMessage("Oops!", "Something bad happened, try again later!")
+                    } else {
+                        listener?.onMoviesListResult()
+                    }
                 })
     }
 

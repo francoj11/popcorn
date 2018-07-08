@@ -18,7 +18,7 @@ class SearchViewModel @Inject constructor(private val searchRepository: SearchRe
     }
 
     fun doSearch(searchQuery: String, yearQuery: String?): LiveData<SearchResult>? {
-        searchResult = searchRepository.getSearchResult(searchQuery, yearQuery)
+        searchResult = searchRepository.getSearchResult(searchQuery.trim(), yearQuery)
         return searchResult
     }
 }

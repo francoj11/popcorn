@@ -25,6 +25,7 @@
         <activity
             android:name=".ui.activities.MainActivity"
             android:label="@string/title_activity_main"
+            android:windowSoftInputMode="adjustNothing"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
