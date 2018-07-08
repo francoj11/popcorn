@@ -81,7 +81,8 @@ class SearchFragment : Fragment() {
             return
         }
         showLoading(true)
-        searchViewModel.doSearch(titleSearchEt.text.toString())?.observe(this,
+        searchViewModel.doSearch(titleSearchEt.text.toString(),
+                                yearSearchEt.text.toString())?.observe(this,
                 Observer {
                     showLoading(false)
                     listener?.onMoviesListResult()

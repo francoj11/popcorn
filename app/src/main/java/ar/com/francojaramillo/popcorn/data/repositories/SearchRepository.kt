@@ -6,6 +6,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import ar.com.francojaramillo.popcorn.data.models.SearchResult
 import ar.com.francojaramillo.popcorn.data.services.MovieService
+import ar.com.francojaramillo.popcorn.utils.Constants
 import java.util.concurrent.Executor
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,9 +31,16 @@ class SearchRepository @Inject constructor(private val movieService: MovieServic
      * Searches for the movies with the searchQuery argument. It returns a LiveData object
      * immediately that will be filled once the network request finished
      */
-    fun getSearchResult(searchQuery: String): LiveData<SearchResult> {
+    fun getSearchResult(searchQuery: String, yearQuery: String?): LiveData<SearchResult> {
 
-        val request = movieService.getMovieSearchResult(searchQuery = searchQuery)
+        // Construct the params for the request
+        var params = HashMap<String, String>()
+        params.put(Constants.API_SEARCH_KEY, searchQuery)
+        if (yearQuery != null) {
+            params.put(Constants.API_SEARCH_YEAR_KEY, yearQuery.toString())
+        }
+
+        val request = movieService.getMovieSearchResult(params = params)
         Log.d(TAG, "REQUEST: " + request.request()?.url())
 
         // We return a liveData immediately and fill it with the result of the request when

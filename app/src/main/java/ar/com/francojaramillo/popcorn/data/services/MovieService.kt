@@ -6,6 +6,7 @@ import ar.com.francojaramillo.popcorn.utils.Constants
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
+import retrofit2.http.QueryMap
 
 /**
  * MovieService is a remote service to query about movies. Its implementation is provided by
@@ -15,5 +16,5 @@ interface MovieService {
 
     @GET("/")
     fun getMovieSearchResult(@Query("apikey") apiKey: String = Constants.API_KEY,
-                             @Query("s") searchQuery: String): Call<SearchResult>
+                             @QueryMap params: Map<String, String>): Call<SearchResult>
 }
