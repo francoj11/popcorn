@@ -1,11 +1,16 @@
 package ar.com.francojaramillo.popcorn.ui.fragments
 
+import android.Manifest
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.DialogInterface
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -18,6 +23,7 @@ import ar.com.francojaramillo.popcorn.PopcornApplication
 import ar.com.francojaramillo.popcorn.R
 import ar.com.francojaramillo.popcorn.data.models.Movie
 import ar.com.francojaramillo.popcorn.ui.adapters.MoviesAdapter
+import ar.com.francojaramillo.popcorn.utils.ImageDownloader
 import ar.com.francojaramillo.popcorn.viewmodels.FavsMovieViewModel
 import ar.com.francojaramillo.popcorn.viewmodels.ViewModelFactory
 import javax.inject.Inject
@@ -30,6 +36,8 @@ class FavoritesMoviesFragment : Fragment() {
     // Tag  for Logging
     private val TAG = "POPCORN_TAG"
 
+    private val REQUEST_WRITE_PERMISSION = 1003
+
     // Views
     private lateinit var moviesRv: RecyclerView
     private lateinit var movieAdapter: MoviesAdapter
@@ -39,6 +47,8 @@ class FavoritesMoviesFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var favsMovieViewModel: FavsMovieViewModel
+
+    var moviePosterToDownload: Movie? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,7 +88,7 @@ class FavoritesMoviesFragment : Fragment() {
             }
 
             override fun onDownloadClick(movie: Movie){
-                Log.d(TAG, "ON DOWNLOAD: " + movie.title)
+                downloadPoster(movie)
             }
         })
         moviesRv.adapter = movieAdapter
@@ -100,6 +110,56 @@ class FavoritesMoviesFragment : Fragment() {
         }
 
         movieAdapter.notifyDataSetChanged()
+    }
+
+
+    /**
+     * Downloads a poster
+     */
+    fun downloadPoster(movie: Movie) {
+        // Save it in case we dont have permissions, so we can ask later to download if the
+        // permission is granted
+        moviePosterToDownload = movie
+
+        // Check write permissions
+        if (ContextCompat.checkSelfPermission(activity!!,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_PERMISSION)
+        } else {
+            // Download magic
+            ImageDownloader().execute(movie)
+            showMessage(getString(R.string.poster_downloaded),
+                        getString(R.string.poster_downloaded_description))
+        }
+
+    }
+
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+                                            grantResults: IntArray) {
+
+        if (requestCode == REQUEST_WRITE_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                downloadPoster(moviePosterToDownload!!)
+            } else {
+                showMessage(getString(R.string.permission_denied),
+                        getString(R.string.permission_denied_description))
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
+    }
+
+
+    /**
+     * Shows an AlertDialog with Title and message
+     */
+    fun showMessage(title: String?, message: String?) {
+        AlertDialog.Builder(activity!!)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Ok", { dialog: DialogInterface?, which: Int -> })
+                .show()
     }
 
     override fun onAttach(context: Context) {

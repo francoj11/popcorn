@@ -6,7 +6,11 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -22,10 +26,15 @@ import ar.com.francojaramillo.popcorn.R
 import ar.com.francojaramillo.popcorn.data.models.Movie
 import ar.com.francojaramillo.popcorn.data.models.SearchResult
 import ar.com.francojaramillo.popcorn.ui.adapters.MoviesAdapter
+import ar.com.francojaramillo.popcorn.utils.ImageDownloader
 import ar.com.francojaramillo.popcorn.viewmodels.FavsMovieViewModel
 import ar.com.francojaramillo.popcorn.viewmodels.SearchViewModel
 import ar.com.francojaramillo.popcorn.viewmodels.ViewModelFactory
 import com.squareup.picasso.Picasso
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.net.URL
 import javax.inject.Inject
 
 /**
@@ -48,6 +57,8 @@ class MoviesFragment : Fragment() {
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var searchViewModel: SearchViewModel
     lateinit var favsMovieViewModel: FavsMovieViewModel
+
+    var moviePosterToDownload: Movie? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -115,6 +126,9 @@ class MoviesFragment : Fragment() {
      * Downloads a poster
      */
     fun downloadPoster(movie: Movie) {
+        // Save it in case we dont have permissions, so we can ask later to download if the
+        // permission is granted
+        moviePosterToDownload = movie
 
         // Check write permissions
         if (ContextCompat.checkSelfPermission(activity!!,
@@ -122,17 +136,22 @@ class MoviesFragment : Fragment() {
             requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_PERMISSION)
         } else {
             // Download magic
+            ImageDownloader().execute(movie)
+            showMessage(getString(R.string.poster_downloaded),
+                        getString(R.string.poster_downloaded_description))
         }
 
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+                                            grantResults: IntArray) {
 
         if (requestCode == REQUEST_WRITE_PERMISSION) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Download magic
+                downloadPoster(moviePosterToDownload!!)
             } else {
-                showMessage("Permission denied", "You need to give this app permission to write to external storage in order to save the poster!")
+                showMessage(getString(R.string.permission_denied),
+                            getString(R.string.permission_denied_description))
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -149,44 +168,6 @@ class MoviesFragment : Fragment() {
                 .setPositiveButton("Ok", { dialog: DialogInterface?, which: Int -> })
                 .show()
     }
-    /*
-    v
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        if (requestCode == WRITE_EXTERNAL_PERMISSION) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // CON PERMISO, AHORA PODEMOS DESCARGAR
-                downloadClick();
-            } else {
-                // Your app will not have this permission. Turn off all functions
-                // that require this permission or it will force close like your
-                // original question
-
-                ConfirmationDialogFragment dialog = ConfirmationDialogFragment
-                        .newInstance("Permiso de escritura",
-                                "Debés permitir a la app poder escribir en el " +
-                                        "almacenamiento externo para guardar el pdf",
-                                "Permitir", "Cancelar", false);
-                dialog.setConfirmationListener(new ConfirmationDialogFragment.ConfirmationListener() {
-                    @Override
-                    public void onPositiveClick() {
-                        downloadClick();
-                    }
-
-                    @Override
-                    public void onNegativeClick() {
-                    }
-                });
-                dialog.show(getChildFragmentManager(), null);
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-     */
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

@@ -16,5 +16,9 @@
     <string name="title_required_description">You must provide a movie title to search for movies</string>
     <string name="no_movies_found">No movies found</string>
     <string name="no_fav_movie">You don\'t have any favorite movie!</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="permission_denied_description">You need to give this app permission to write to external storage in order to save the poster!</string>
+    <string name="poster_downloaded">Poster downloaded</string>
+    <string name="poster_downloaded_description">The poster was saved in your pictures folder!</string>
 
 </resources>
