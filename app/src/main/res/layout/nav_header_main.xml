@@ -17,7 +17,7 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         app:civ_border="true"
-        app:civ_border_color="@color/colorPrimaryDark"
+        app:civ_border_color="@color/soft_gray"
         app:civ_border_width="2dp"
         android:contentDescription="@string/nav_header_desc"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
