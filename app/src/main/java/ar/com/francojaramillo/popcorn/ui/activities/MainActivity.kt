@@ -12,6 +12,7 @@ import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import ar.com.francojaramillo.popcorn.R
+import ar.com.francojaramillo.popcorn.ui.fragments.FavoritesMoviesFragment
 import ar.com.francojaramillo.popcorn.ui.fragments.MoviesFragment
 import ar.com.francojaramillo.popcorn.ui.fragments.SearchFragment
 
@@ -94,7 +95,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // as you specify a parent activity in AndroidManifest.xml.
         when (item.itemId) {
             R.id.action_favs -> {
-                // Manage favorites
+                replaceFragment(FavoritesMoviesFragment.newInstance(), null, true)
                 return true
             }
             else -> return super.onOptionsItemSelected(item)
