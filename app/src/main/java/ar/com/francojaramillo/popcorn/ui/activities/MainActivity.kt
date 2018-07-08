@@ -12,6 +12,7 @@ import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import ar.com.francojaramillo.popcorn.R
+import ar.com.francojaramillo.popcorn.ui.fragments.MoviesFragment
 import ar.com.francojaramillo.popcorn.ui.fragments.SearchFragment
 
 /**
@@ -119,6 +120,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
+    /**
+     * When there is a  result, it changes the search fragment for the Movies Fragment that
+     * displays the result in a nice list
+     */
     override fun onMoviesListResult() {
+        replaceFragment(MoviesFragment.newInstance(), null, true)
     }
 }
