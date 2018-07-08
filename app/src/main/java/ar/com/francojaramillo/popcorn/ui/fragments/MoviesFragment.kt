@@ -1,10 +1,15 @@
 package ar.com.francojaramillo.popcorn.ui.fragments
 
+import android.Manifest
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.DialogInterface
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -20,6 +25,7 @@ import ar.com.francojaramillo.popcorn.ui.adapters.MoviesAdapter
 import ar.com.francojaramillo.popcorn.viewmodels.FavsMovieViewModel
 import ar.com.francojaramillo.popcorn.viewmodels.SearchViewModel
 import ar.com.francojaramillo.popcorn.viewmodels.ViewModelFactory
+import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
 /**
@@ -30,13 +36,16 @@ class MoviesFragment : Fragment() {
     // Tag  for Logging
     private val TAG = "POPCORN_TAG"
 
+    private val REQUEST_WRITE_PERMISSION = 1002
+
     // Views
     private lateinit var moviesRv: RecyclerView
     private lateinit var noMoviesFoundTv: TextView
     private lateinit var movieAdapter: MoviesAdapter
 
     // Viewmodels
-    @Inject lateinit var viewModelFactory: ViewModelFactory
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
     lateinit var searchViewModel: SearchViewModel
     lateinit var favsMovieViewModel: FavsMovieViewModel
 
@@ -70,7 +79,7 @@ class MoviesFragment : Fragment() {
         noMoviesFoundTv.visibility = View.GONE
 
         moviesRv.layoutManager = LinearLayoutManager(context)
-        movieAdapter = MoviesAdapter(context!!, emptyList(), object: MoviesAdapter.OnInteractionListener{
+        movieAdapter = MoviesAdapter(context!!, emptyList(), object : MoviesAdapter.OnInteractionListener {
 
             override fun onFavClick(movie: Movie) {
                 if (movie.isFavorite) {
@@ -81,8 +90,8 @@ class MoviesFragment : Fragment() {
                 movieAdapter.notifyDataSetChanged()
             }
 
-            override fun onDownloadClick(movie: Movie){
-                Log.d(TAG, "ON DOWNLOAD: " + movie.title)
+            override fun onDownloadClick(movie: Movie) {
+                downloadPoster(movie)
             }
         })
         moviesRv.adapter = movieAdapter
@@ -101,6 +110,83 @@ class MoviesFragment : Fragment() {
             movieAdapter?.notifyDataSetChanged()
         }
     }
+
+    /**
+     * Downloads a poster
+     */
+    fun downloadPoster(movie: Movie) {
+
+        // Check write permissions
+        if (ContextCompat.checkSelfPermission(activity!!,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_PERMISSION)
+        } else {
+            // Download magic
+        }
+
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+
+        if (requestCode == REQUEST_WRITE_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Download magic
+            } else {
+                showMessage("Permission denied", "You need to give this app permission to write to external storage in order to save the poster!")
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
+    }
+
+    /**
+     * Shows an AlertDialog with Title and message
+     */
+    fun showMessage(title: String?, message: String?) {
+        AlertDialog.Builder(activity!!)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Ok", { dialog: DialogInterface?, which: Int -> })
+                .show()
+    }
+    /*
+    v
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == WRITE_EXTERNAL_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // CON PERMISO, AHORA PODEMOS DESCARGAR
+                downloadClick();
+            } else {
+                // Your app will not have this permission. Turn off all functions
+                // that require this permission or it will force close like your
+                // original question
+
+                ConfirmationDialogFragment dialog = ConfirmationDialogFragment
+                        .newInstance("Permiso de escritura",
+                                "Debés permitir a la app poder escribir en el " +
+                                        "almacenamiento externo para guardar el pdf",
+                                "Permitir", "Cancelar", false);
+                dialog.setConfirmationListener(new ConfirmationDialogFragment.ConfirmationListener() {
+                    @Override
+                    public void onPositiveClick() {
+                        downloadClick();
+                    }
+
+                    @Override
+                    public void onNegativeClick() {
+                    }
+                });
+                dialog.show(getChildFragmentManager(), null);
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+     */
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
