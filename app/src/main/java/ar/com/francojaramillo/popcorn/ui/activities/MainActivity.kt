@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
@@ -25,6 +26,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     // Tag  for Logging
     private val TAG = "POPCORN_TAG"
+
+    private val FAVS_FRAGMENT_TAG = "favFragmentTag"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,11 +71,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     /**
      * Manages the back button logic:
      *      - If navdrawer is open -> close it
+     *      - If seeing the favs and press back -> go back to search fragment
      */
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
+            // Check which fragment is displayed
+            if (supportFragmentManager.backStackEntryCount > 0) {
+                val index = supportFragmentManager.backStackEntryCount - 1
+                val backEntry = supportFragmentManager.getBackStackEntryAt(index)
+                if (backEntry.name ==  FAVS_FRAGMENT_TAG) {
+                    while (supportFragmentManager.backStackEntryCount > 1) {
+                        supportFragmentManager.popBackStackImmediate()
+                    }
+                }
+            }
             super.onBackPressed()
         }
     }
@@ -95,7 +109,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // as you specify a parent activity in AndroidManifest.xml.
         when (item.itemId) {
             R.id.action_favs -> {
-                replaceFragment(FavoritesMoviesFragment.newInstance(), null, true)
+                replaceFragment(FavoritesMoviesFragment.newInstance(), FAVS_FRAGMENT_TAG, true)
                 return true
             }
             else -> return super.onOptionsItemSelected(item)
@@ -109,7 +123,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Handle navigation view item clicks here.
         when (item.itemId) {
             R.id.action_favorites -> {
-                // Manage favorites
+                replaceFragment(FavoritesMoviesFragment.newInstance(), FAVS_FRAGMENT_TAG, true)
             }
             R.id.action_log_out -> {
                 // Manage Logout

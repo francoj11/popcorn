@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import ar.com.francojaramillo.popcorn.PopcornApplication
 
 import ar.com.francojaramillo.popcorn.R
@@ -32,6 +33,7 @@ class FavoritesMoviesFragment : Fragment() {
     // Views
     private lateinit var moviesRv: RecyclerView
     private lateinit var movieAdapter: MoviesAdapter
+    private lateinit var noFavMovieTv: TextView
 
     // Viewmodels
     @Inject
@@ -61,6 +63,7 @@ class FavoritesMoviesFragment : Fragment() {
     fun setupViews(rootView: View) {
 
         moviesRv = rootView.findViewById(R.id.movies_rv)
+        noFavMovieTv = rootView.findViewById(R.id.no_fav_movie_tv)
         moviesRv.layoutManager = LinearLayoutManager(context)
 
         movieAdapter = MoviesAdapter(context!!, emptyList(), object: MoviesAdapter.OnInteractionListener{
@@ -89,10 +92,10 @@ class FavoritesMoviesFragment : Fragment() {
 
         Log.d(TAG,"ALL MOVIES: " + movieList.size)
         if (movieList == null || movieList.size == 0) {
-            //noMoviesFoundTv?.visibility = View.VISIBLE
+            noFavMovieTv.visibility = View.VISIBLE
             movieAdapter.updateMovieList(emptyList())
         } else {
-            //noMoviesFoundTv?.visibility = View.GONE
+            noFavMovieTv.visibility = View.GONE
             movieAdapter.updateMovieList(movieList)
         }
 

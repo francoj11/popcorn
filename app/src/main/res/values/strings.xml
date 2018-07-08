@@ -15,5 +15,6 @@
     <string name="title_required">Title required</string>
     <string name="title_required_description">You must provide a movie title to search for movies</string>
     <string name="no_movies_found">No movies found</string>
+    <string name="no_fav_movie">You don\'t have any favorite movie!</string>
 
 </resources>
