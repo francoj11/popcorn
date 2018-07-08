@@ -17,6 +17,7 @@ import ar.com.francojaramillo.popcorn.R
 import ar.com.francojaramillo.popcorn.data.models.Movie
 import ar.com.francojaramillo.popcorn.data.models.SearchResult
 import ar.com.francojaramillo.popcorn.ui.adapters.MoviesAdapter
+import ar.com.francojaramillo.popcorn.viewmodels.FavsMovieViewModel
 import ar.com.francojaramillo.popcorn.viewmodels.SearchViewModel
 import ar.com.francojaramillo.popcorn.viewmodels.ViewModelFactory
 import javax.inject.Inject
@@ -37,6 +38,7 @@ class MoviesFragment : Fragment() {
     // Viewmodels
     @Inject lateinit var viewModelFactory: ViewModelFactory
     lateinit var searchViewModel: SearchViewModel
+    lateinit var favsMovieViewModel: FavsMovieViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,8 +50,11 @@ class MoviesFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.fragment_movies, container, false)
 
         // Viewmodel initialization
-        searchViewModel = ViewModelProviders.of(activity!!, viewModelFactory).get(SearchViewModel::class.java)
-        searchViewModel?.getSearchResult()?.observe(this, Observer { updateUI(it!!) })
+        searchViewModel = ViewModelProviders.of(activity!!, viewModelFactory)
+                .get(SearchViewModel::class.java)
+        searchViewModel.getSearchResult()?.observe(this, Observer { updateUI(it!!) })
+        favsMovieViewModel = ViewModelProviders.of(activity!!, viewModelFactory)
+                .get(FavsMovieViewModel::class.java)
 
         setupViews(rootView)
 
@@ -68,7 +73,12 @@ class MoviesFragment : Fragment() {
         movieAdapter = MoviesAdapter(context!!, emptyList(), object: MoviesAdapter.OnInteractionListener{
 
             override fun onFavClick(movie: Movie) {
-                Log.d(TAG, "ON FAV CLICK: " + movie.title)
+                if (movie.isFavorite) {
+                    favsMovieViewModel.deleteMovie(movie)
+                } else {
+                    favsMovieViewModel.addFavMovie(movie)
+                }
+                movieAdapter.notifyDataSetChanged()
             }
 
             override fun onDownloadClick(movie: Movie){
@@ -94,7 +104,7 @@ class MoviesFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        
+
         // Dagger DI
         (activity!!.application as PopcornApplication).appComponent.inject(this)
     }

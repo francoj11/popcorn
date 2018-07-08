@@ -9,7 +9,7 @@ import javax.inject.Singleton
 
 @Singleton
 @Component(modules = arrayOf(AppModule::class, NetworkModule::class, ExecutorModule::class,
-                             RepositoryModule::class, ViewModelModule::class))
+                             RepositoryModule::class, ViewModelModule::class, RoomModule::class))
 interface AppComponent {
     fun inject(searchFragment: SearchFragment)
     fun inject(moviesFragment: MoviesFragment)

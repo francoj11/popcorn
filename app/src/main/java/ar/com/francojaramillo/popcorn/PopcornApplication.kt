@@ -4,6 +4,7 @@ import android.app.Application
 import ar.com.francojaramillo.popcorn.dagger.AppComponent
 import ar.com.francojaramillo.popcorn.dagger.AppModule
 import ar.com.francojaramillo.popcorn.dagger.DaggerAppComponent
+import ar.com.francojaramillo.popcorn.dagger.RoomModule
 
 class PopcornApplication: Application() {
 
@@ -16,6 +17,6 @@ class PopcornApplication: Application() {
     }
 
     private fun initDagger(app: PopcornApplication): AppComponent {
-        return DaggerAppComponent.builder().appModule(AppModule(app)).build()
+        return DaggerAppComponent.builder().appModule(AppModule(app)).roomModule(RoomModule(app)).build()
     }
 }

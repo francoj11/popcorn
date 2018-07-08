@@ -3,6 +3,7 @@ package ar.com.francojaramillo.popcorn.dagger
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
+import ar.com.francojaramillo.popcorn.viewmodels.FavsMovieViewModel
 import ar.com.francojaramillo.popcorn.viewmodels.SearchViewModel
 import ar.com.francojaramillo.popcorn.viewmodels.ViewModelFactory
 import dagger.Binds
@@ -29,4 +30,8 @@ abstract class ViewModelModule {
     @ViewModelKey(SearchViewModel::class)
     internal abstract fun searchViewModel(viewModel: SearchViewModel): ViewModel
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(FavsMovieViewModel::class)
+    internal abstract fun favsMovieViewModel(viewModel: FavsMovieViewModel): ViewModel
 }

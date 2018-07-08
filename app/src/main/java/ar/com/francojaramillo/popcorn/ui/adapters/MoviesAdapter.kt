@@ -37,7 +37,7 @@ class MoviesAdapter(private val mContext: Context, private var moviesList: List<
         holder?.downloadBtn?.setOnClickListener{ mListener.onDownloadClick(currentMovie)}
 
         if (currentMovie.isFavorite) {
-            holder?.favBtn?.setImageResource(R.drawable.ic_fav_full)
+            holder?.favBtn?.setImageResource(R.drawable.ic_fav_full_red)
         } else {
             holder?.favBtn?.setImageResource(R.drawable.ic_fav_empty)
         }
