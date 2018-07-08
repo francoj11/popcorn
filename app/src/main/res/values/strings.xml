@@ -8,9 +8,11 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="movie_title">Movie Title</string>
     <string name="movie_year">Movie Year</string>
     <string name="search">Search</string>
+    <string name="title_required">Title required</string>
+    <string name="title_required_description">You must provide a movie title to search for movies</string>
+
 </resources>

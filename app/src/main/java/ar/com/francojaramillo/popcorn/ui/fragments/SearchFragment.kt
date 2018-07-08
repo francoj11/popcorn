@@ -1,17 +1,23 @@
 package ar.com.francojaramillo.popcorn.ui.fragments
 
 import android.app.ProgressDialog
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
-import android.net.Uri
+import android.content.DialogInterface
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-
+import ar.com.francojaramillo.popcorn.PopcornApplication
 import ar.com.francojaramillo.popcorn.R
+import ar.com.francojaramillo.popcorn.viewmodels.SearchViewModel
+import ar.com.francojaramillo.popcorn.viewmodels.ViewModelFactory
+import javax.inject.Inject
 
 /**
  * Fragment in charge of the Search Use case.
@@ -27,6 +33,11 @@ class SearchFragment : Fragment() {
     private lateinit var titleSearchEt: EditText
     private lateinit var yearSearchEt: EditText
     private lateinit var searchBtn: Button
+
+    // ViewModels
+    @Inject lateinit var viewModelFactory: ViewModelFactory
+    lateinit var searchViewModel: SearchViewModel
+
 
     // Progress Dialog
     private var progresDialog: ProgressDialog? = null
@@ -44,6 +55,9 @@ class SearchFragment : Fragment() {
 
         setupViews(rootView)
 
+        // Get the viewModel
+        searchViewModel = ViewModelProviders.of(activity!!, viewModelFactory).get(SearchViewModel::class.java)
+
         return rootView
     }
 
@@ -57,15 +71,61 @@ class SearchFragment : Fragment() {
         searchBtn.setOnClickListener { searchMovies() }
     }
 
+    /**
+     * Tells the Viewmodel to search for movies
+     */
     fun searchMovies() {
+        if (titleSearchEt.text.toString().isEmpty()) {
+            showMessage(getString(R.string.title_required),
+                    getString(R.string.title_required_description))
+            return
+        }
+        showLoading(true)
+        searchViewModel.doSearch(titleSearchEt.text.toString())?.observe(this,
+                Observer {
+                    showLoading(false)
+                    listener?.onMoviesListResult()
+                })
+    }
+
+
+    /**
+     * Shows an AlertDialog with Title and message
+     */
+    fun showMessage(title: String?, message: String?) {
+        AlertDialog.Builder(activity!!)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Ok", { dialog: DialogInterface?, which: Int -> })
+                .show()
+    }
+
+    /**
+     * Shows or hide a progressDialog
+     */
+    fun showLoading(isLoading: Boolean) {
+        if (isLoading) {
+            progresDialog = ProgressDialog(context)
+            progresDialog?.setMessage("Searching...")
+            progresDialog?.setCancelable(false)
+            progresDialog?.show()
+        } else {
+            if (progresDialog != null) {
+                progresDialog?.hide()
+            }
+        }
 
     }
+
 
     /**
      * Attachs the listener to the activity
      */
     override fun onAttach(context: Context) {
         super.onAttach(context)
+
+        // Dagger DI
+        (activity!!.application as PopcornApplication).appComponent.inject(this)
 
         if (context is OnMoviesListResultListener) {
             listener = context
