@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import ar.com.francojaramillo.popcorn.R
 import ar.com.francojaramillo.popcorn.utils.Constants
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 
 class SplashActivity : AppCompatActivity() {
 
@@ -14,9 +15,17 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
         Handler().postDelayed({
-            val intent = Intent(this, SignInActivity::class.java)
-            startActivity(intent)
-            finish()
+            val account = GoogleSignIn.getLastSignedInAccount(this)
+
+            if (account != null) {
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            } else {
+                val intent = Intent(this, SignInActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
 
         }, Constants.SPLASH_TIME)
     }

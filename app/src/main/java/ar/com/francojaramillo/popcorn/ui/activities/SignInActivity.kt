@@ -20,6 +20,9 @@ import com.google.android.gms.tasks.Task
  */
 class SignInActivity : AppCompatActivity() {
 
+    // Tag  for Logging
+    private val TAG = "POPCORN_TAG"
+
     // Constants to use in activity result
     private val GOOGLE_SIGN_IN = 1001
 
@@ -76,7 +79,7 @@ class SignInActivity : AppCompatActivity() {
             val account = task.getResult(ApiException::class.java)
             Log.d("POPCORN_TAG", "EMAIL: " + account.email)
 
-            var intent = Intent(this, SplashActivity::class.java)
+            var intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
         } catch (e: Exception) {
@@ -84,6 +87,9 @@ class SignInActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Shows an AlertDialog with Title and message
+     */
     fun showMessage(title: String?, message: String?) {
         AlertDialog.Builder(this)
                 .setTitle(title)
