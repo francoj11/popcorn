@@ -4,12 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
     tools:context=".ui.activities.SignInActivity">
 
+    <ImageView
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:src="@drawable/popcorn_splash" />
+
     <com.google.android.gms.common.SignInButton
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="@dimen/space_medium"
         android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="@dimen/space_medium"
+        app:buttonSize="wide" />
 </FrameLayout>

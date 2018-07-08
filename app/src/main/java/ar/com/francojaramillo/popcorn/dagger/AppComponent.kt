@@ -1,5 +1,6 @@
 package ar.com.francojaramillo.popcorn.dagger
 
+import ar.com.francojaramillo.popcorn.ui.activities.MainActivity
 import ar.com.francojaramillo.popcorn.ui.fragments.FavoritesMoviesFragment
 import ar.com.francojaramillo.popcorn.ui.fragments.MoviesFragment
 import ar.com.francojaramillo.popcorn.ui.fragments.SearchFragment
@@ -15,4 +16,5 @@ interface AppComponent {
     fun inject(searchFragment: SearchFragment)
     fun inject(moviesFragment: MoviesFragment)
     fun inject(moviesFragment: FavoritesMoviesFragment)
+    fun inject(mainActivity: MainActivity)
 }

@@ -1,5 +1,7 @@
 package ar.com.francojaramillo.popcorn.ui.activities
 
+import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
@@ -10,12 +12,19 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import ar.com.francojaramillo.popcorn.PopcornApplication
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import ar.com.francojaramillo.popcorn.R
 import ar.com.francojaramillo.popcorn.ui.fragments.FavoritesMoviesFragment
 import ar.com.francojaramillo.popcorn.ui.fragments.MoviesFragment
 import ar.com.francojaramillo.popcorn.ui.fragments.SearchFragment
+import ar.com.francojaramillo.popcorn.viewmodels.FavsMovieViewModel
+import ar.com.francojaramillo.popcorn.viewmodels.ViewModelFactory
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import javax.inject.Inject
 
 /**
  * Main activity that manages the navigation in the app.
@@ -29,19 +38,42 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private val FAVS_FRAGMENT_TAG = "favFragmentTag"
 
+    private var mGoogleSignInClient: GoogleSignInClient? = null
+
+    // Viewmodels
+    @Inject lateinit var viewModelFactory: ViewModelFactory
+    lateinit var favsMovieViewModel: FavsMovieViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        setupGoogleSignIn()
+
+        setupNavigationDrawer()
+
+        // Dagger DI
+        (application as PopcornApplication).appComponent.inject(this)
+
+        favsMovieViewModel = ViewModelProviders.of(this, viewModelFactory)
+                                                    .get(FavsMovieViewModel::class.java)
+
+        loadFragment(SearchFragment.newInstance(), null)
+    }
+
+    /**
+     * setup the navigation drawer
+     */
+    fun setupNavigationDrawer() {
         val toggle = ActionBarDrawerToggle(
-                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+                this, drawer_layout, toolbar, R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
 
-        loadFragment(SearchFragment.newInstance(), null)
     }
 
     /**
@@ -53,6 +85,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .commit()
 
     }
+
+    /**
+     * Setups the GoogleClient for signing in
+     */
+    private fun setupGoogleSignIn() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail().build()
+
+        // Build a GoogleSignInClient with the options specified by gso.
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+    }
+
 
     /**
      * Replaces the current fragment in the fragment container with the new one
@@ -125,15 +169,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.action_favorites -> {
                 replaceFragment(FavoritesMoviesFragment.newInstance(), FAVS_FRAGMENT_TAG, true)
             }
-            R.id.action_log_out -> {
-                // Manage Logout
-            }
+            R.id.action_log_out -> { signOutCleanUp() }
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
 
+    /**
+     * Signs out and cleans the favorites
+     */
+    fun signOutCleanUp() {
+        mGoogleSignInClient?.signOut()
+
+        favsMovieViewModel.deleteAllMovies()
+        val intent = Intent(this, SignInActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
 
     /**
      * When there is a  result, it changes the search fragment for the Movies Fragment that
