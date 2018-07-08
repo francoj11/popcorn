@@ -12,6 +12,8 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ImageView
+import android.widget.TextView
 import ar.com.francojaramillo.popcorn.PopcornApplication
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
@@ -24,6 +26,8 @@ import ar.com.francojaramillo.popcorn.viewmodels.ViewModelFactory
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.mikhaellopez.circularimageview.CircularImageView
+import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
 /**
@@ -39,6 +43,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val FAVS_FRAGMENT_TAG = "favFragmentTag"
 
     private var mGoogleSignInClient: GoogleSignInClient? = null
+
+    // Views
+    private lateinit var userNameTv: TextView
+    private lateinit var userEmailTv: TextView
+    private lateinit var userProfileIv: CircularImageView
 
     // Viewmodels
     @Inject lateinit var viewModelFactory: ViewModelFactory
@@ -74,6 +83,30 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         nav_view.setNavigationItemSelectedListener(this)
 
+        val headerLayout = nav_view.getHeaderView(0)
+        userNameTv = headerLayout.findViewById(R.id.user_name_tv)
+        userEmailTv = headerLayout.findViewById(R.id.user_email_tv)
+        userProfileIv = headerLayout.findViewById(R.id.user_profile_iv)
+
+        // Obtain the user and set the name and email in the nav drawer
+        val account = GoogleSignIn.getLastSignedInAccount(this)
+        if (account != null) {
+            if (account.displayName != null) {
+                userNameTv.text = account.displayName
+            } else {
+                userNameTv.text = "User"
+            }
+
+            if (account.email != null) {
+                userEmailTv.text = account.email
+            } else {
+                userEmailTv.text = "Email"
+            }
+
+            if (account.photoUrl != null) {
+                Picasso.with(this).load(account.photoUrl).into(userProfileIv)
+            }
+        }
     }
 
     /**
