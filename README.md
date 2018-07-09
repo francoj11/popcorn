@@ -18,12 +18,12 @@ The app uses Google as an authentication provider and is the entry point of the 
 The app is based in the new Architecture Components provided by Google in 2017 and is written in Kotlin (the new official language to write Android apps since 2017 as well). 
 
 The app is constructed with an MVVM architecture and uses these well-known libraries:
-    - Dagger: For Dependency Injection
-    - Room: For easy SQLite interaction and save the favorites
-    - LiveData: To implement the Reactive paradigm with lifecycle-component-aware objects
-    - ViewModel: To implement the MVVM architecture
-    - Retrofit: For easy REST requests
-    - Picasso: To manage async images and cache efficiently
+* Dagger: For Dependency Injection
+* Room: For easy SQLite interaction and save the favorites
+* LiveData: To implement the Reactive paradigm with lifecycle-component-aware objects
+* ViewModel: To implement the MVVM architecture
+* Retrofit: For easy REST requests
+* Picasso: To manage async images and cache efficiently
     
 -----------------
 ## Developed by:
